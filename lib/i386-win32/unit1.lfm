@@ -1,0 +1,162 @@
+object Form1: TForm1
+  Left = 207
+  Height = 597
+  Top = 364
+  Width = 953
+  BorderStyle = bsDialog
+  Caption = 'Автомат фон Неймана'
+  ClientHeight = 597
+  ClientWidth = 953
+  OnCreate = FormCreate
+  LCLVersion = '1.6.0.4'
+  object DrawGrid1: TDrawGrid
+    Left = 24
+    Height = 555
+    Top = 16
+    Width = 555
+    ColCount = 0
+    DefaultColWidth = 19
+    DefaultRowHeight = 19
+    Enabled = False
+    ExtendedSelect = False
+    FixedCols = 0
+    FixedRows = 0
+    RowCount = 0
+    TabOrder = 0
+    OnDrawCell = DrawGrid1DrawCell
+    OnMouseUp = DrawGrid1MouseUp
+  end
+  object Vvod: TButton
+    Left = 744
+    Height = 25
+    Top = 96
+    Width = 75
+    Caption = 'Ввести'
+    Enabled = False
+    OnClick = VvodClick
+    TabOrder = 1
+  end
+  object Edit1: TEdit
+    Left = 688
+    Height = 23
+    Top = 64
+    Width = 40
+    MaxLength = 2
+    OnChange = Edit1Change
+    OnKeyPress = Edit1KeyPress
+    TabOrder = 2
+  end
+  object Edit2: TEdit
+    Left = 840
+    Height = 23
+    Top = 64
+    Width = 40
+    Enabled = False
+    MaxLength = 2
+    OnChange = Edit2Change
+    OnKeyPress = Edit2KeyPress
+    TabOrder = 3
+  end
+  object Label1: TLabel
+    Left = 672
+    Height = 15
+    Top = 39
+    Width = 82
+    Caption = 'Введите длину '
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 816
+    Height = 15
+    Top = 39
+    Width = 85
+    Caption = 'Введите высоту'
+    ParentColor = False
+  end
+  object DrawGrid2: TDrawGrid
+    Left = 672
+    Height = 124
+    Top = 184
+    Width = 214
+    ColCount = 7
+    DefaultColWidth = 30
+    DefaultRowHeight = 30
+    Enabled = False
+    ExtendedSelect = False
+    FixedCols = 0
+    FixedRows = 0
+    ParentShowHint = False
+    RowCount = 4
+    TabOrder = 4
+    OnDrawCell = DrawGrid2DrawCell
+    OnMouseUp = DrawGrid2MouseUp
+  end
+  object Label3: TLabel
+    Left = 746
+    Height = 15
+    Top = 152
+    Width = 59
+    Caption = 'Состояния'
+    ParentColor = False
+  end
+  object Button1: TButton
+    Left = 672
+    Height = 25
+    Top = 368
+    Width = 75
+    Caption = 'Запуск'
+    Enabled = False
+    OnClick = Button1Click
+    ParentShowHint = False
+    TabOrder = 5
+  end
+  object Button2: TButton
+    Left = 816
+    Height = 25
+    Top = 368
+    Width = 75
+    Caption = 'Пауза'
+    Enabled = False
+    OnClick = Button2Click
+    TabOrder = 6
+  end
+  object Label4: TLabel
+    Left = 672
+    Height = 15
+    Top = 440
+    Width = 82
+    Caption = 'Поколение = 0'
+    ParentColor = False
+  end
+  object Label5: TLabel
+    Left = 672
+    Height = 15
+    Top = 472
+    Width = 80
+    Caption = 'Население = 0'
+    ParentColor = False
+  end
+  object DrawGrid3: TDrawGrid
+    Left = 885
+    Height = 34
+    Top = 274
+    Width = 34
+    ColCount = 1
+    DefaultColWidth = 30
+    DefaultRowHeight = 30
+    Enabled = False
+    ExtendedSelect = False
+    FixedCols = 0
+    FixedRows = 0
+    RowCount = 1
+    TabOrder = 7
+    OnDrawCell = DrawGrid3DrawCell
+    OnMouseUp = DrawGrid3MouseUp
+  end
+  object Timer1: TTimer
+    Enabled = False
+    OnTimer = Timer1Timer
+    left = 624
+    top = 40
+  end
+end

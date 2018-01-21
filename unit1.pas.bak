@@ -1,0 +1,2289 @@
+unit Unit1;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Grids,
+  StdCtrls, ExtCtrls;
+
+type
+
+  MySostoyanie = (U, T00, T01, T02, T03, T20, T10, T11, T31, T30, T21,
+    C00, C01, C10, C11, T100, T110, T120, T130, T101, T111, T121, T131,
+    S, S0, S00, S01, S000, S1, S10, S11);
+  { TForm1 }
+
+  TForm1 = class(TForm)
+    Button1: TButton;
+    Button2: TButton;
+    DrawGrid2: TDrawGrid;
+    DrawGrid3: TDrawGrid;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Timer1: TTimer;
+    Vvod: TButton;
+    DrawGrid1: TDrawGrid;
+    Edit1: TEdit;
+    Edit2: TEdit;
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure DrawGrid1DrawCell(Sender: TObject; aCol, aRow: integer;
+      aRect: TRect; aState: TGridDrawState);
+    procedure DrawGrid1MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: integer);
+    procedure DrawGrid2DrawCell(Sender: TObject; aCol, aRow: integer;
+      aRect: TRect; aState: TGridDrawState);
+    procedure DrawGrid2MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: integer);
+    procedure DrawGrid3DrawCell(Sender: TObject; aCol, aRow: integer;
+      aRect: TRect; aState: TGridDrawState);
+    procedure DrawGrid3MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: integer);
+    procedure Edit1Change(Sender: TObject);
+    procedure Edit1KeyPress(Sender: TObject; var Key: char);
+    procedure Edit2Change(Sender: TObject);
+    procedure Edit2KeyPress(Sender: TObject; var Key: char);
+    procedure FormCreate(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
+    procedure VvodClick(Sender: TObject);
+  private
+    { private declarations }
+  public
+    { public declarations }
+  end;
+
+var
+  Form1: TForm1;
+  DrawGrid2: TDrawGrid;
+  B: array [1..29] of TBitmap;
+  sostoyanie, Count: integer;
+  Buf: TBitmap;
+  aC, aR, aC1, aR1, x, y, i, j, c: integer;
+  Pole: array [0..28, 0..28] of Mysostoyanie;
+  Pole2: array [0..28, 0..28] of Mysostoyanie;
+  Pole3: array [0..28, 0..28] of boolean;
+  Pole4: array [0..28, 0..28] of boolean;
+  Pole5: array [0..28, 0..28] of boolean;
+  Picture: array [0..28, 0..28] of TBitmap;
+  Perehod, check, check2, check3, check4, check5, check6, check7, check8, check9: boolean;
+  path: string;
+
+implementation
+
+{$R *.lfm}
+
+{ TForm1 }
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  path := ExtractFileDir(Application.ExeName);
+  for sostoyanie := 1 to 29 do
+  begin
+    B[sostoyanie] := TBitmap.Create;
+    B[sostoyanie].LoadFromFile(path + '\icons\' + IntToStr(sostoyanie) + '.bmp');
+  end;
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+var
+  f, g: integer;
+begin
+  for f := 0 to x - 1 do
+    for g := 0 to y - 1 do
+    begin
+      Pole2[f, g] := Pole[f, g];
+    end;
+  for f := 0 to x - 1 do
+    for g := 0 to y - 1 do
+    begin
+      if (Pole[f, g] = U) then
+      begin
+       // if (Pole[f - 1, g] = T01) then
+       // begin
+        //  Pole5[f,g]:=true;
+        //  Pole2[f - 1, g] := T00;
+        // Picture[f - 1, g] := B[5];
+        //end;
+        if f <> 0 then if (Pole[f + 1, g] = T21) then
+        begin
+          Pole5[f,g]:=true;
+          Pole2[f+1,g]:=T20;
+          Picture[f+1,g]:=B[3];
+          inc(c);
+        end;
+        if f <> 0 then if (Pole[f - 1, g] = T01)then
+        begin
+          Pole5[f,g]:=true;
+          Pole2[f-1,g]:=T00;
+          Picture[f-1,g]:=B[5];
+          inc(c);
+        end;
+        if f <> 0 then if (Pole[f,g-1] = T31) then
+        begin
+          Pole5[f,g]:=true;
+          Pole2[f,g-1]:=T30;
+          Picture[f,g-1]:=B[1];
+          inc(c);
+        end;
+        if f <> 0 then if (Pole[f,g+1] = T11) then
+        begin
+          Pole5[f,g]:=true;
+          Pole2[f,g+1]:=T10;
+          Picture[f,g+1]:=B[7];
+          inc(c);
+        end;
+      end
+      else
+      if (Pole[f, g] = S) then
+      begin
+       //if (Pole[f - 1, g] = T01) then
+        //begin
+        //  check9:=true;
+        //  Pole5[f,g]:=true;
+        //  Pole2[f - 1, g] := T00;
+        //  Picture[f - 1, g] := B[5];
+        //end;
+        if (Pole[f + 1, g] = T21) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f+1,g]:=T20;
+          Picture[f+1,g]:=B[3];
+        end;
+        if (Pole[f,g-1] = T31) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g-1]:=T30;
+          Picture[f,g-1]:=B[1];
+        end;
+        if (Pole[f,g+1] = T11) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g+1]:=T10;
+          Picture[f,g+1]:=B[7];
+        end;
+        if (check9 = false) then
+        begin
+          Pole2[f,g]:=S0;
+          Picture[f,g]:=B[23];
+        end;
+       check9:=false;
+      end
+      else
+      if (Pole[f, g] = S0) then
+      begin
+        if (Pole[f + 1, g] = T21) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f+1,g]:=T20;
+          Picture[f+1,g]:=B[3];
+        end;
+        if (Pole[f,g-1] = T31) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g-1]:=T30;
+          Picture[f,g-1]:=B[1];
+        end;
+        if (Pole[f,g+1] = T11) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g+1]:=T10;
+          Picture[f,g+1]:=B[7];
+        end;
+        if (check9 = false) then
+        begin
+          Pole2[f,g]:=S00;
+          Picture[f,g]:=B[25];
+        end;
+        check9:=false;
+      end
+      else
+      if (Pole[f, g] = S00) then
+      begin
+       if (Pole[f + 1, g] = T21) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f+1,g]:=T20;
+          Picture[f+1,g]:=B[3];
+        end;
+        if (Pole[f,g-1] = T31) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g-1]:=T30;
+          Picture[f,g-1]:=B[1];
+        end;
+        if (Pole[f,g+1] = T11) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g+1]:=T10;
+          Picture[f,g+1]:=B[7];
+        end;
+        if (check9 = false) then
+        begin
+          Pole2[f,g]:=S000;
+          Picture[f,g]:=B[29];
+        end;
+        check9:=false;
+      end
+      else
+      if (Pole[f,g] = S1) then
+       begin
+         if (Pole[f + 1, g] = T21) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f+1,g]:=T20;
+          Picture[f+1,g]:=B[3];
+        end;
+        if (Pole[f,g-1] = T31) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g-1]:=T30;
+          Picture[f,g-1]:=B[1];
+        end;
+        if (Pole[f,g+1] = T11) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g+1]:=T10;
+          Picture[f,g+1]:=B[7];
+        end;
+        if (check9 = false) then
+        begin
+         Pole2[f,g]:=S10;
+         Picture[f,g]:=B[27];
+        end;
+        check9:=false;
+       end
+      else
+      if (Pole[f, g] = S000) then
+       begin
+        if (Pole[f + 1, g] = T21) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f+1,g]:=T20;
+          Picture[f+1,g]:=B[3];
+        end;
+        if (Pole[f,g-1] = T31) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g-1]:=T30;
+          Picture[f,g-1]:=B[1];
+        end;
+        if (Pole[f,g+1] = T11) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g+1]:=T10;
+          Picture[f,g+1]:=B[7];
+        end;
+        if (check9 = false) then
+        begin
+          Pole2[f,g]:=T00;
+          Picture[f,g]:=B[5];
+        end;
+        check9:=false;
+      end
+      else
+      if (Pole[f,g] = S01) then
+      begin
+       if (Pole[f + 1, g] = T21) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f+1,g]:=T20;
+          Picture[f+1,g]:=B[3];
+        end;
+        if (Pole[f,g-1] = T31) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g-1]:=T30;
+          Picture[f,g-1]:=B[1];
+        end;
+        if (Pole[f,g+1] = T11) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g+1]:=T10;
+          Picture[f,g+1]:=B[7];
+        end;
+        if (check9 = false) then
+        begin
+          Pole2[f,g]:=T30;
+          Picture[f,g]:=B[1];
+        end;
+        check9:=false;
+      end
+      else
+      if (Pole[f,g] = S10) then
+      begin
+        if (Pole[f + 1, g] = T21) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f+1,g]:=T20;
+          Picture[f+1,g]:=B[3];
+        end;
+        if (Pole[f,g-1] = T31) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g-1]:=T30;
+          Picture[f,g-1]:=B[1];
+        end;
+        if (Pole[f,g+1] = T11) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g+1]:=T10;
+          Picture[f,g+1]:=B[7];
+        end;
+        if (check9 = false) then
+        begin
+          Pole2[f,g]:=T110;
+          Picture[f,g]:=B[16];
+        end;
+        check9:=false;
+      end
+      else
+      if (Pole[f,g] = S11) then
+      begin
+        if (Pole[f + 1, g] = T21) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f+1,g]:=T20;
+          Picture[f+1,g]:=B[3];
+        end;
+        if (Pole[f,g-1] = T31) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g-1]:=T30;
+          Picture[f,g-1]:=B[1];
+        end;
+        if (Pole[f,g+1] = T11) then
+        begin
+          check9:=true;
+          Pole5[f,g]:=true;
+          Pole2[f,g+1]:=T10;
+          Picture[f,g+1]:=B[7];
+        end;
+        if (check9 = false) then
+        begin
+          Pole2[f,g]:=T130;
+          Picture[f,g]:=B[13];
+        end;
+        check9:=false;
+      end;
+      if (Pole[f, g] = C00) then
+      begin
+        if (Pole[f, g - 1] = T131) then
+        begin
+          Pole2[f, g] := U;
+          Picture[f, g] := B[21];
+          Pole2[f, g - 1] := T130;
+          Picture[f, g - 1] := B[13];
+        end;
+        if (Pole[f, g + 1] = T111) then
+        begin
+          Pole2[f, g] := U;
+          Picture[f, g] := B[21];
+          Pole2[f, g + 1] := T110;
+          Picture[f, g + 1] := B[16];
+        end;
+        if (Pole[f + 1, g] = T121) then
+        begin
+          Pole2[f, g] := U;
+          Picture[f, g] := B[21];
+          Pole2[f + 1, g] := T120;
+          Picture[f + 1, g] := B[14];
+        end;
+        if (Pole[f - 1, g] = T101) then
+        begin
+          Pole2[f, g] := U;
+          Picture[f, g] := B[21];
+          Pole2[f - 1, g] := T100;
+          Picture[f - 1, g] := B[15];
+        end;
+        if (Pole[f, g + 1] = T10) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+        end
+        else
+        if (Pole[f + 1, g] = T20) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+        end
+        else
+        if (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+          check3 := True;
+        end;
+        if (Pole[f, g + 1] = T10) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+        end
+        else
+        if (Pole[f, g - 1] = T30) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+        end
+        else
+        if (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+          check3 := True;
+        end;
+        if (Pole[f - 1, g] = T01) and (Pole[f, g + 1] = T10) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+        end
+        else
+        if (Pole[f - 1, g] = T01) and (Pole[f + 1, g] = T20) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+        end
+        else
+        if (Pole[f - 1, g] = T01) and (Pole[f, g - 1] = T30) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+        end
+        else
+        if (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+          check3 := True;
+        end;
+        if (Pole[f, g + 1] = T11) and (Pole[f + 1, g] = T20) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+        end
+        else
+        if (Pole[f, g + 1] = T11) and (Pole[f, g - 1] = T30) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+        end
+        else
+        if (Pole[f, g + 1] = T11) and (Pole[f - 1, g] = T00) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+        end
+        else
+        if (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+          check3 := True;
+        end;
+        if (check3 = True) then
+        begin
+          Pole2[f, g] := C01;
+          Picture[f, g] := B[10];
+          check3 := False;
+        end;
+      end
+      else
+      if (Pole[f, g] = C01) then
+      begin
+        if (Pole[f, g - 1] = T131) then
+        begin
+          check8 := True;
+          Pole2[f, g - 1] := T130;
+          Picture[f, g - 1] := B[13];
+        end;
+        if (Pole[f, g + 1] = T111) then
+        begin
+          check8 := True;
+          Pole2[f, g + 1] := T110;
+          Picture[f, g + 1] := B[16];
+        end;
+        if (Pole[f + 1, g] = T121) then
+        begin
+          check8 := True;
+          Pole2[f + 1, g] := T120;
+          Picture[f + 1, g] := B[14];
+        end;
+        if (Pole[f - 1, g] = T101) then
+        begin
+          check8 := True;
+          Pole2[f - 1, g] := T100;
+          Picture[f - 1, g] := B[15];
+        end;
+        if (Pole[f, g + 1] = T10) and (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+        end
+        else
+        if (Pole[f + 1, g] = T20) and (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+        end
+        else
+        if (Pole[f, g - 1] = T30) and (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+        end
+        else
+        if (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+          check4 := True;
+        end;
+        if (Pole[f, g + 1] = T10) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+        end
+        else
+        if (Pole[f + 1, g] = T20) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+        end
+        else
+        if (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+          check4 := True;
+        end;
+        if (Pole[f, g + 1] = T10) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+        end
+        else
+        if (Pole[f, g - 1] = T30) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+        end
+        else
+        if (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+          check4 := True;
+        end;
+        if (Pole[f + 1, g] = T20) and (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+        end
+        else
+        if (Pole[f, g - 1] = T30) and (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+        end
+        else
+        if (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+          check4 := True;
+        end;
+        if (check4 = False) then
+        begin
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end;
+        if (check4 = True) then
+        begin
+          Pole2[f, g] := C11;
+          Picture[f, g] := B[12];
+          check4 := False;
+        end;
+        if (check8 = True) then
+        begin
+          Pole2[f, g] := U;
+          Picture[f, g] := B[21];
+          check8 := False;
+        end;
+      end
+      else
+      if (Pole[f, g] = C10) then
+      begin
+        if (Pole[f, g - 1] = T131) then
+        begin
+          Pole2[f, g - 1] := T130;
+          Picture[f, g - 1] := B[13];
+          check6 := True;
+        end;
+        if (Pole[f, g + 1] = T111) then
+        begin
+          Pole2[f, g + 1] := T110;
+          Picture[f, g + 1] := B[16];
+          check6 := True;
+        end;
+        if (Pole[f + 1, g] = T121) then
+        begin
+          Pole2[f + 1, g] := T120;
+          Picture[f + 1, g] := B[14];
+          check6 := True;
+        end;
+        if (Pole[f - 1, g] = T101) then
+        begin
+          Pole2[f - 1, g] := T100;
+          Picture[f - 1, g] := B[15];
+          check6 := True;
+        end;
+        if (Pole[f, g + 1] = T10) and (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+        end
+        else
+        if (Pole[f + 1, g] = T20) and (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+        end
+        else
+        if (Pole[f, g - 1] = T30) and (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+        end
+        else
+        if (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+          check5 := True;
+        end;
+        ////////////////////////////
+        if (Pole[f - 1, g] = T20) or (Pole[f - 1, g] = T21) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        if (Pole[f - 1, g] = T10) or (Pole[f - 1, g] = T11) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        if (Pole[f - 1, g] = T30) or (Pole[f - 1, g] = T31) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        if (Pole[f - 1, g] = T120) or (Pole[f - 1, g] = T121) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        if (Pole[f - 1, g] = T110) or (Pole[f - 1, g] = T111) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        if (Pole[f - 1, g] = T130) or (Pole[f - 1, g] = T131) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        ////////////////////////////
+        if (Pole[f, g + 1] = T10) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+        end
+        else
+        if (Pole[f, g - 1] = T30) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+        end
+        else
+        if (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+          check5 := True;
+        end;
+        ///////////////////////////
+        if (Pole[f + 1, g] = T00) or (Pole[f + 1, g] = T01) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        if (Pole[f + 1, g] = T10) or (Pole[f + 1, g] = T11) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        if (Pole[f + 1, g] = T30) or (Pole[f + 1, g] = T31) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        if (Pole[f + 1, g] = T100) or (Pole[f + 1, g] = T101) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        if (Pole[f + 1, g] = T110) or (Pole[f + 1, g] = T111) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        if (Pole[f + 1, g] = T130) or (Pole[f + 1, g] = T131) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        ///////////////////////////
+        if (Pole[f, g + 1] = T10) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+        end
+        else
+        if (Pole[f + 1, g] = T20) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+        end
+        else
+        if (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+          check5 := True;
+        end;
+        ///////////////////////////
+        if (Pole[f, g - 1] = T10) or (Pole[f, g - 1] = T11) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        if (Pole[f, g - 1] = T20) or (Pole[f, g - 1] = T21) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        if (Pole[f, g - 1] = T00) or (Pole[f, g - 1] = T01) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        if (Pole[f, g - 1] = T110) or (Pole[f, g - 1] = T111) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        if (Pole[f, g - 1] = T120) or (Pole[f, g - 1] = T121) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        if (Pole[f, g - 1] = T100) or (Pole[f, g - 1] = T101) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        ///////////////////////////
+        if (Pole[f + 1, g] = T20) and (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+        end
+        else
+        if (Pole[f, g - 1] = T30) and (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+        end
+        else
+        if (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+          check5 := True;
+        end;
+        //////////////////////////////
+        if (Pole[f, g + 1] = T30) or (Pole[f, g + 1] = T31) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        if (Pole[f, g + 1] = T20) or (Pole[f, g + 1] = T21) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        if (Pole[f, g + 1] = T00) or (Pole[f, g + 1] = T01) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        if (Pole[f, g + 1] = T130) or (Pole[f, g + 1] = T131) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        if (Pole[f, g + 1] = T120) or (Pole[f, g + 1] = T121) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        if (Pole[f, g + 1] = T100) or (Pole[f, g + 1] = T101) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        //////////////////////////////
+        if (check5 = False) then
+        begin
+          Pole2[f, g] := C00;
+          Picture[f, g] := B[9];
+        end;
+        if (check5 = True) then
+        begin
+          Pole2[f, g] := C01;
+          Picture[f, g] := B[10];
+          check5 := False;
+        end;
+        if (check6 = True) then
+        begin
+          Pole2[f, g] := U;
+          Picture[f, g] := B[21];
+          check6 := False;
+        end;
+      end
+      else
+      if (Pole[f, g] = C11) then
+      begin
+        if (Pole[f, g - 1] = T131) then
+        begin
+          Pole2[f, g - 1] := T130;
+          Picture[f, g - 1] := B[13];
+          check7 := True;
+        end;
+        if (Pole[f, g + 1] = T111) then
+        begin
+          Pole2[f, g + 1] := T110;
+          Picture[f, g + 1] := B[16];
+          check7 := True;
+        end;
+        if (Pole[f - 1, g] = T101) then
+        begin
+          Pole2[f - 1, g] := T100;
+          Picture[f - 1, g] := B[15];
+          check7 := True;
+        end;
+        if (Pole[f + 1, g] = T121) then
+        begin
+          Pole2[f + 1, g] := T120;
+          Picture[f + 1, g] := B[14];
+          check7 := True;
+        end;
+        if (Pole[f, g + 1] = T10) and (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f + 1, g] = T20) and (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f, g - 1] = T30) and (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f - 1, g] = T01) then
+        begin
+          Pole2[f - 1, g] := T00;
+          Picture[f - 1, g] := B[5];
+          check := True;
+        end;
+        ///////////////////////
+        if (Pole[f - 1, g] = T20) or (Pole[f - 1, g] = T21) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        if (Pole[f - 1, g] = T10) or (Pole[f - 1, g] = T11) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        if (Pole[f - 1, g] = T30) or (Pole[f - 1, g] = T31) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        if (Pole[f - 1, g] = T120) or (Pole[f - 1, g] = T121) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        if (Pole[f - 1, g] = T110) or (Pole[f - 1, g] = T111) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        if (Pole[f - 1, g] = T130) or (Pole[f - 1, g] = T131) then
+        begin
+          Pole3[f - 1, g] := True;
+        end;
+        ///////////////////////
+        if (Pole[f, g + 1] = T10) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f + 1, g] = T20) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f, g - 1] = T31) then
+        begin
+          Pole2[f, g - 1] := T30;
+          Picture[f, g - 1] := B[1];
+          check := True;
+        end;
+        ////////////////////////
+        if (Pole[f, g - 1] = T10) or (Pole[f, g - 1] = T11) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        if (Pole[f, g - 1] = T20) or (Pole[f, g - 1] = T21) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        if (Pole[f, g - 1] = T00) or (Pole[f, g - 1] = T01) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        if (Pole[f, g - 1] = T110) or (Pole[f, g - 1] = T111) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        if (Pole[f, g - 1] = T120) or (Pole[f, g - 1] = T121) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        if (Pole[f, g - 1] = T100) or (Pole[f, g - 1] = T101) then
+        begin
+          Pole3[f, g - 1] := True;
+        end;
+        ////////////////////////
+        if (Pole[f, g + 1] = T10) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f, g - 1] = T30) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f + 1, g] = T21) then
+        begin
+          Pole2[f + 1, g] := T20;
+          Picture[f + 1, g] := B[3];
+          check := True;
+        end;
+        ////////////////////////
+        if (Pole[f + 1, g] = T00) or (Pole[f + 1, g] = T01) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        if (Pole[f + 1, g] = T10) or (Pole[f + 1, g] = T11) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        if (Pole[f + 1, g] = T30) or (Pole[f + 1, g] = T31) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        if (Pole[f + 1, g] = T100) or (Pole[f + 1, g] = T101) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        if (Pole[f + 1, g] = T110) or (Pole[f + 1, g] = T111) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        if (Pole[f + 1, g] = T130) or (Pole[f + 1, g] = T131) then
+        begin
+          Pole3[f + 1, g] := True;
+        end;
+        ////////////////////////
+        if (Pole[f + 1, g] = T20) and (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f, g - 1] = T30) and (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f - 1, g] = T00) and (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end
+        else
+        if (Pole[f, g + 1] = T11) then
+        begin
+          Pole2[f, g + 1] := T10;
+          Picture[f, g + 1] := B[7];
+          check := True;
+        end;
+        ///////////////////////
+        if (Pole[f, g + 1] = T30) or (Pole[f, g + 1] = T31) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        if (Pole[f, g + 1] = T00) or (Pole[f, g + 1] = T01) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        if (Pole[f, g + 1] = T20) or (Pole[f, g + 1] = T21) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        if (Pole[f, g + 1] = T130) or (Pole[f, g + 1] = T131) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        if (Pole[f, g + 1] = T100) or (Pole[f, g + 1] = T101) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        if (Pole[f, g + 1] = T120) or (Pole[f, g + 1] = T121) then
+        begin
+          Pole3[f, g + 1] := True;
+        end;
+        ///////////////////////
+        if (check2 = False) then
+        begin
+          Pole2[f, g] := C10;
+          Picture[f, g] := B[11];
+        end;
+        if (check = True) then
+        begin
+          Pole2[f, g] := C11;
+          Picture[f, g] := B[12];
+          check := False;
+          check2 := False;
+        end;
+        if (check7 = True) then
+        begin
+          Pole2[f, g] := U;
+          Picture[f, g] := B[21];
+          check7 := False;
+        end;
+      end;
+      // конец конфлюентных состояний
+
+
+      // начало обычный передающих состояний
+      if (Pole[f, g] = T11) and (Pole[f, g - 1] = T10) or (Pole[f, g] = T11) and
+        (Pole[f, g - 1] = T11) then
+      begin
+        Pole3[f, g - 1] := True;
+        Pole2[f, g] := T10;
+        Picture[f, g] := B[7];
+      end
+      else
+      if (Pole[f, g] = T31) and (Pole[f, g + 1] = T30) or (Pole[f, g] = T31) and
+        (Pole[f, g + 1] = T31) then
+      begin
+        Pole3[f, g + 1] := True;
+        Pole2[f, g] := T30;
+        Picture[f, g] := B[1];
+      end
+      else
+      if (Pole[f, g] = T01) and (Pole[f + 1, g] = T00) or (Pole[f, g] = T01) and
+        (Pole[f + 1, g] = T01) then
+      begin
+        Pole3[f + 1, g] := True;
+        Pole2[f, g] := T00;
+        Picture[f, g] := B[5];
+      end
+      else
+      if (Pole[f, g] = T21) and (Pole[f - 1, g] = T20) or (Pole[f, g] = T21) and
+        (Pole[f - 1, g] = T21) then
+      begin
+        Pole3[f - 1, g] := True;
+        Pole2[f, g] := T20;
+        Picture[f, g] := B[3];
+      end
+      else
+      if (Pole[f, g] = T01) and (Pole[f + 1, g] = T10) or (Pole[f, g] = T01) and
+        (Pole[f + 1, g] = T11) then
+      begin
+        Pole3[f + 1, g] := True;
+        Pole2[f, g] := T00;
+        Picture[f, g] := B[5];
+      end
+      else
+      if (Pole[f, g] = T01) and (Pole[f + 1, g] = T30) or (Pole[f, g] = T01) and
+        (Pole[f + 1, g] = T31) then
+      begin
+        Pole3[f + 1, g] := True;
+        Pole2[f, g] := T00;
+        Picture[f, g] := B[5];
+      end
+      else
+      if (Pole[f, g] = T21) and (Pole[f - 1, g] = T10) or (Pole[f, g] = T21) and
+        (Pole[f - 1, g] = T11) then
+      begin
+        Pole3[f - 1, g] := True;
+        Pole2[f, g] := T20;
+        Picture[f, g] := B[3];
+      end
+      else
+      if (Pole[f, g] = T21) and (Pole[f - 1, g] = T30) or (Pole[f, g] = T21) and
+        (Pole[f - 1, g] = T31) then
+      begin
+        Pole3[f - 1, g] := True;
+        Pole2[f, g] := T20;
+        Picture[f, g] := B[3];
+      end
+      else
+      if (Pole[f, g] = T11) and (Pole[f, g - 1] = T20) or (Pole[f, g] = T11) and
+        (Pole[f, g - 1] = T21) then
+      begin
+        Pole3[f, g - 1] := True;
+        Pole2[f, g] := T10;
+        Picture[f, g] := B[7];
+      end
+      else
+      if (Pole[f, g] = T11) and (Pole[f, g - 1] = T00) or (Pole[f, g] = T11) and
+        (Pole[f, g - 1] = T01) then
+      begin
+        Pole3[f, g - 1] := True;
+        Pole2[f, g] := T10;
+        Picture[f, g] := B[7];
+      end
+      else
+      if (Pole[f, g] = T31) and (Pole[f, g + 1] = T00) or (Pole[f, g] = T31) and
+        (Pole[f, g + 1] = T01) then
+      begin
+        Pole3[f, g + 1] := True;
+        Pole2[f, g] := T30;
+        Picture[f, g] := B[1];
+      end
+      else
+      if (Pole[f, g] = T31) and (Pole[f, g + 1] = T20) or (Pole[f, g] = T31) and
+        (Pole[f, g + 1] = T21) then
+      begin
+        Pole3[f, g + 1] := True;
+        Pole2[f, g] := T30;
+        Picture[f, g] := B[1];
+      end
+      else
+      if (Pole[f, g] = T31) and (Pole[f, g + 1] = T10) then
+      begin
+        Pole2[f, g] := T30;
+        Picture[f, g] := B[1];
+      end
+      else
+      if (Pole[f, g] = T11) and (Pole[f, g - 1] = T30) then
+      begin
+        Pole2[f, g] := T10;
+        Picture[f, g] := B[7];
+      end
+      else
+      if (Pole[f, g] = T31) and (Pole[f, g + 1] = T11) then
+      begin
+        Pole2[f, g] := T30;
+        Picture[f, g] := B[1];
+        Pole2[f, g + 1] := T10;
+        Picture[f, g + 1] := B[7];
+      end
+      else
+      if (Pole[f, g] = T21) and (Pole[f - 1, g] = T01) then
+      begin
+        Pole2[f, g] := T20;
+        Picture[f, g] := B[3];
+        Pole[f - 1, g] := T00;
+        Picture[f - 1, g] := B[5];
+      end
+      else
+      if (Pole[f, g] = T21) and (Pole[f - 1, g] = T00) then
+      begin
+        Pole2[f, g] := T20;
+        Picture[f, g] := B[3];
+      end
+      else
+      if (Pole[f, g] = T01) and (Pole[f + 1, g] = T20) then
+      begin
+        Pole2[f, g] := T00;
+        Picture[f, g] := B[5];
+      end
+      else
+      // конец обычных передающих состояний
+      // начало обычных и специальых передающих состояний
+      if (Pole[f, g] = T01) and (Pole[f + 1, g] = T101) or (Pole[f, g] = T01) and
+        (Pole[f + 1, g] = T111) or (Pole[f, g] = T01) and (Pole[f + 1, g] = T121) or
+        (Pole[f, g] = T01) and (Pole[f + 1, g] = T131) then
+      begin
+        //Pole2[f+1,g]:=U;
+        //Picture[f+1,g]:=B[21];
+        Pole4[f + 1, g] := True;
+        Pole2[f, g] := T00;
+        Picture[f, g] := B[5];
+      end
+      else
+      if (Pole[f, g] = T21) and (Pole[f - 1, g] = T101) or (Pole[f, g] = T21) and
+        (Pole[f - 1, g] = T121) or (Pole[f, g] = T21) and (Pole[f - 1, g] = T111) or
+        (Pole[f, g] = T21) and (Pole[f - 1, g] = T131) then
+      begin
+        //Pole2[f-1,g]:=U;
+        //Picture[f-1,g]:=B[21];
+        Pole4[f - 1, g] := True;
+        Pole2[f, g] := T20;
+        Picture[f, g] := B[3];
+      end
+      else
+      if (Pole[f, g] = T11) and (Pole[f, g - 1] = T111) or (Pole[f, g] = T11) and
+        (Pole[f, g - 1] = T101) or (Pole[f, g] = T11) and (Pole[f, g - 1] = T121) or
+        (Pole[f, g] = T11) and (Pole[f, g - 1] = T131) then
+      begin
+        Pole4[f, g - 1] := True;
+        Pole2[f, g] := T10;
+        Picture[f, g] := B[7];
+      end
+      else
+      if (Pole[f, g] = T31) and (Pole[f, g + 1] = T131) or (Pole[f, g] = T31) and
+        (Pole[f, g + 1] = T111) or (Pole[f, g] = T31) and (Pole[f, g + 1] = T101) or
+        (Pole[f, g] = T31) and (Pole[f, g + 1] = T121) then
+      begin
+        Pole4[f, g + 1] := True;
+        Pole2[f, g] := T30;
+        Picture[f, g] := B[1];
+      end
+      else
+      if (Pole[f, g] = T01) and (Pole[f + 1, g] = T100) or (Pole[f, g] = T01) and
+        (Pole[f + 1, g] = T110) or (Pole[f, g] = T01) and (Pole[f + 1, g] = T120) or
+        (Pole[f, g] = T01) and (Pole[f + 1, g] = T130) then
+      begin
+        Pole2[f + 1, g] := U;
+        Picture[f + 1, g] := B[21];
+        Pole2[f, g] := T00;
+        Picture[f, g] := B[5];
+      end
+      else
+      if (Pole[f, g] = T21) and (Pole[f - 1, g] = T120) or (Pole[f, g] = T21) and
+        (Pole[f - 1, g] = T100) or (Pole[f, g] = T21) and (Pole[f - 1, g] = T110) or
+        (Pole[f, g] = T21) and (Pole[f - 1, g] = T130) then
+      begin
+        Pole2[f - 1, g] := U;
+        Picture[f - 1, g] := B[21];
+        Pole2[f, g] := T20;
+        Picture[f, g] := B[3];
+      end
+      else
+      if (Pole[f, g] = T11) and (Pole[f, g - 1] = T110) or (Pole[f, g] = T11) and
+        (Pole[f, g - 1] = T100) or (Pole[f, g] = T11) and (Pole[f, g - 1] = T120) or
+        (Pole[f, g] = T11) and (Pole[f, g - 1] = T130) then
+      begin
+        Pole2[f, g - 1] := U;
+        Picture[f, g - 1] := B[21];
+        Pole2[f, g] := T10;
+        Picture[f, g] := B[7];
+      end
+      else
+      if (Pole[f, g] = T31) and (Pole[f, g + 1] = T130) or (Pole[f, g] = T31) and
+        (Pole[f, g + 1] = T110) or (Pole[f, g] = T31) and (Pole[f, g + 1] = T100) or
+        (Pole[f, g] = T31) and (Pole[f, g + 1] = T120) then
+      begin
+        Pole2[f, g + 1] := U;
+        Picture[f, g + 1] := B[21];
+        Pole2[f, g] := T30;
+        Picture[f, g] := B[1];
+      end
+      else
+      // конец обычных и специальых передающих состояний
+      // начало специальных передающих состояний
+      if (Pole[f, g] = T101) and (Pole[f + 1, g] = T100) or (Pole[f, g] = T101) and
+        (Pole[f + 1, g] = T101) then
+      begin
+        Pole3[f + 1, g] := True;
+        Pole2[f, g] := T100;
+        Picture[f, g] := B[15];
+      end
+      else
+      if (Pole[f, g] = T101) and (Pole[f + 1, g] = T110) or (Pole[f, g] = T101) and
+        (Pole[f + 1, g] = T111) then
+      begin
+        //Pole2[f+1,g]:=T111;
+        //Picture[f+1,g]:=B[20];
+        Pole3[f + 1, g] := True;
+        Pole2[f, g] := T100;
+        Picture[f, g] := B[15];
+      end
+      else
+      if (Pole[f, g] = T101) and (Pole[f + 1, g] = T130) or (Pole[f, g] = T101) and
+        (Pole[f + 1, g] = T131) then
+      begin
+        //Pole2[f+1,g]:=T131;
+        //Picture[f+1,g]:=B[17];
+        Pole3[f + 1, g] := True;
+        Pole2[f, g] := T100;
+        Picture[f, g] := B[15];
+      end
+      else
+      if (Pole[f, g] = T121) and (Pole[f - 1, g] = T120) or (Pole[f, g] = T121) and
+        (Pole[f - 1, g] = T121) then
+      begin
+        //Pole2[f-1,g]:=T121;
+        //Picture[f-1,g]:=B[18];
+        Pole3[f - 1, g] := True;
+        Pole2[f, g] := T120;
+        Picture[f, g] := B[14];
+      end
+      else
+      if (Pole[f, g] = T121) and (Pole[f - 1, g] = T110) or (Pole[f, g] = T121) and
+        (Pole[f - 1, g] = T111) then
+      begin
+        //Pole2[f-1,g]:=T111;
+        //Picture[f-1,g]:=B[20];
+        Pole3[f - 1, g] := True;
+        Pole2[f, g] := T120;
+        Picture[f, g] := B[14];
+      end
+      else
+      if (Pole[f, g] = T121) and (Pole[f - 1, g] = T130) or (Pole[f, g] = T121) and
+        (Pole[f - 1, g] = T131) then
+      begin
+        //Pole2[f-1,g]:=T131;
+        //Picture[f-1,g]:=B[17];
+        Pole3[f - 1, g] := True;
+        Pole2[f, g] := T120;
+        Picture[f, g] := B[14];
+      end
+      else
+      if (Pole[f, g] = T111) and (Pole[f, g - 1] = T100) or (Pole[f, g] = T111) and
+        (Pole[f, g - 1] = T101) then
+      begin
+        //Pole2[f,g-1]:=T101;
+        //Picture[f,g-1]:=B[19];
+        Pole3[f, g - 1] := True;
+        Pole2[f, g] := T110;
+        Picture[f, g] := B[16];
+      end
+      else
+      if (Pole[f, g] = T111) and (Pole[f, g - 1] = T120) or (Pole[f, g] = T111) and
+        (Pole[f, g - 1] = T121) then
+      begin
+        //Pole2[f,g-1]:=T121;
+        //Picture[f,g-1]:=B[18];
+        Pole3[f, g - 1] := True;
+        Pole2[f, g] := T110;
+        Picture[f, g] := B[16];
+      end
+      else
+      if (Pole[f, g] = T111) and (Pole[f, g - 1] = T110) or (Pole[f, g] = T111) and
+        (Pole[f, g - 1] = T111) then
+      begin
+        //Pole2[f,g-1]:=T111;
+        //Picture[f,g-1]:=B[20];
+        Pole3[f, g - 1] := True;
+        Pole2[f, g] := T110;
+        Picture[f, g] := B[16];
+      end
+      else
+      if (Pole[f, g] = T131) and (Pole[f, g + 1] = T130) or (Pole[f, g] = T131) and
+        (Pole[f, g + 1] = T131) then
+      begin
+        //Pole2[f,g+1]:=T131;
+        //Picture[f,g+1]:=B[17];
+        Pole3[f, g + 1] := True;
+        Pole2[f, g] := T130;
+        Picture[f, g] := B[13];
+      end
+      else
+      if (Pole[f, g] = T131) and (Pole[f, g + 1] = T100) or (Pole[f, g] = T131) and
+        (Pole[f, g + 1] = T101) then
+      begin
+        //Pole2[f,g+1]:=T101;
+        //Picture[f,g+1]:=B[19];
+        Pole3[f, g + 1] := True;
+        Pole2[f, g] := T130;
+        Picture[f, g] := B[13];
+      end
+      else
+      if (Pole[f, g] = T131) and (Pole[f, g + 1] = T120) or (Pole[f, g] = T131) and
+        (Pole[f, g + 1] = T121) then
+      begin
+        //Pole2[f,g+1]:=T121;
+        //Picture[f,g+1]:=B[18];
+        Pole3[f, g + 1] := True;
+        Pole2[f, g] := T130;
+        Picture[f, g] := B[13];
+      end
+      else
+      if (Pole[f, g] = T101) and (Pole[f + 1, g] = T120) then
+      begin
+        Pole2[f, g] := T100;
+        Picture[f, g] := B[15];
+      end
+      else
+      if (Pole[f, g] = T121) and (Pole[f - 1, g] = T100) then
+      begin
+        Pole2[f, g] := T120;
+        Picture[f, g] := B[14];
+      end
+      else
+      if (Pole[f, g] = T111) and (Pole[f, g - 1] = T130) then
+      begin
+        Pole2[f, g] := T110;
+        Picture[f, g] := B[16];
+      end
+      else
+      if (Pole[f, g] = T131) and (Pole[f, g + 1] = T110) then
+      begin
+        Pole2[f, g] := T130;
+        Picture[f, g] := B[13];
+      end
+      else
+      if (Pole[f, g] = T111) and (Pole[f, g - 1] = T131) then
+      begin
+        Pole2[f, g] := T110;
+        Picture[f, g] := B[16];
+        Pole2[f, g - 1] := T130;
+        Picture[f, g - 1] := B[13];
+      end
+      else
+      if (Pole[f, g] = T101) and (Pole[f + 1, g] = T121) then
+      begin
+        Pole2[f, g] := T100;
+        Picture[f, g] := B[15];
+        Pole2[f + 1, g] := T120;
+        Picture[f + 1, g] := B[14];
+      end
+      // конец специальных передающих состояний
+      // начало специальных и обычных передающих
+      else
+      if (Pole[f, g] = T101) and (Pole[f + 1, g] = T01) or (Pole[f, g] = T101) and
+        (Pole[f + 1, g] = T11) or (Pole[f, g] = T101) and (Pole[f + 1, g] = T31) or
+        (Pole[f, g] = T101) and (Pole[f + 1, g] = T21) then
+      begin
+        //Pole2[f+1,g]:=U;
+        //Picture[f+1,g]:=B[21];
+        Pole4[f + 1, g] := True;
+        Pole2[f, g] := T100;
+        Picture[f, g] := B[15];
+      end
+      else
+      if (Pole[f, g] = T131) and (Pole[f, g + 1] = T01) or (Pole[f, g] = T131) and
+        (Pole[f, g + 1] = T21) or (Pole[f, g] = T131) and (Pole[f, g + 1] = T11) or
+        (Pole[f, g] = T131) and (Pole[f, g + 1] = T31) then
+      begin
+        Pole4[f, g + 1] := True;
+        Pole2[f, g] := T130;
+        Picture[f, g] := B[13];
+      end
+      else
+      if (Pole[f, g] = T111) and (Pole[f, g - 1] = T11) or (Pole[f, g] = T111) and
+        (Pole[f, g - 1] = T01) or (Pole[f, g] = T111) and (Pole[f, g - 1] = T31) or
+        (Pole[f, g] = T111) and (Pole[f, g - 1] = T21) then
+      begin
+        Pole4[f, g - 1] := True;
+        Pole2[f, g] := T110;
+        Picture[f, g] := B[16];
+      end
+      else
+      if (Pole[f, g] = T121) and (Pole[f - 1, g] = T21) or (Pole[f, g] = T121) and
+        (Pole[f - 1, g] = T11) or (Pole[f, g] = T121) and (Pole[f - 1, g] = T31) or
+        (Pole[f, g] = T121) and (Pole[f - 1, g] = T01) then
+      begin
+        Pole4[f - 1, g] := True;
+        Pole2[f, g] := T120;
+        Picture[f, g] := B[14];
+      end
+      else
+      if (Pole[f, g] = T101) and (Pole[f + 1, g] = T00) or (Pole[f, g] = T101) and
+        (Pole[f + 1, g] = T10) or (Pole[f, g] = T101) and (Pole[f + 1, g] = T30) or
+        (Pole[f, g] = T101) and (Pole[f + 1, g] = T20) then
+      begin
+        Pole2[f + 1, g] := U;
+        Picture[f + 1, g] := B[21];
+        Pole2[f, g] := T100;
+        Picture[f, g] := B[15];
+        dec(c);
+      end
+      else
+      if (Pole[f, g] = T131) and (Pole[f, g + 1] = T00) or (Pole[f, g] = T131) and
+        (Pole[f, g + 1] = T20) or (Pole[f, g] = T131) and (Pole[f, g + 1] = T10) or
+        (Pole[f, g] = T131) and (Pole[f, g + 1] = T30) then
+      begin
+        Pole2[f, g + 1] := U;
+        Picture[f, g + 1] := B[21];
+        Pole2[f, g] := T130;
+        Picture[f, g] := B[13];
+      end
+      else
+      if (Pole[f, g] = T111) and (Pole[f, g - 1] = T10) or (Pole[f, g] = T111) and
+        (Pole[f, g - 1] = T00) or (Pole[f, g] = T111) and (Pole[f, g - 1] = T30) or
+        (Pole[f, g] = T111) and (Pole[f, g - 1] = T20) then
+      begin
+        Pole2[f, g - 1] := U;
+        Picture[f, g - 1] := B[21];
+        Pole2[f, g] := T110;
+        Picture[f, g] := B[16];
+      end
+      else
+      if (Pole[f, g] = T121) and (Pole[f - 1, g] = T20) or (Pole[f, g] = T121) and
+        (Pole[f - 1, g] = T10) or (Pole[f, g] = T121) and (Pole[f - 1, g] = T30) or
+        (Pole[f, g] = T121) and (Pole[f - 1, g] = T00) then
+      begin
+        Pole2[f - 1, g] := U;
+        Picture[f - 1, g] := B[21];
+        Pole[f, g] := T120;
+        Picture[f, g] := B[14];
+      end;
+    end;
+  for f := 0 to x - 1 do
+    for g := 0 to y - 1 do
+    begin
+      Pole[f, g] := Pole2[f, g];
+    end;
+  for f := 0 to x - 1 do
+    for g := 0 to y - 1 do
+    begin
+      if (Pole3[f, g] = True) then
+      begin
+        if (Pole[f, g] = T00) then
+        begin
+          Pole[f, g] := T01;
+          Picture[f, g] := B[6];
+        end;
+        if (Pole[f, g] = T30) then
+        begin
+          Pole[f, g] := T31;
+          Picture[f, g] := B[2];
+        end;
+        if (Pole[f, g] = T10) then
+        begin
+          Pole[f, g] := T11;
+          Picture[f, g] := B[8];
+        end;
+        if (Pole[f, g] = T20) then
+        begin
+          Pole[f, g] := T21;
+          Picture[f, g] := B[4];
+        end;
+        if (Pole[f, g] = T100) then
+        begin
+          Pole[f, g] := T101;
+          Picture[f, g] := B[19];
+        end;
+        if (Pole[f, g] = T110) then
+        begin
+          Pole[f, g] := T111;
+          Picture[f, g] := B[20];
+        end;
+        if (Pole[f, g] = T130) then
+        begin
+          Pole[f, g] := T131;
+          Picture[f, g] := B[17];
+        end;
+        if (Pole[f, g] = T120) then
+        begin
+          Pole[f, g] := T121;
+          Picture[f, g] := B[18];
+        end;
+      end;
+      Pole3[f, g] := False;
+    end;
+  for f := 0 to x - 1 do
+    for g := 0 to y - 1 do
+    begin
+      if (Pole4[f, g] = True) then
+      begin
+        if (Pole[f, g] = T00) or (Pole[f, g] = T10) or (Pole[f, g] = T30) or
+          (Pole[f, g] = T20) then
+        begin
+          Pole[f, g] := U;
+          Picture[f, g] := B[21];
+        end;
+        if (Pole[f, g] = T100) or (Pole[f, g] = T110) or (Pole[f, g] = T120) or
+          (Pole[f, g] = T130) then
+        begin
+          Pole[f, g] := U;
+          Picture[f, g] := B[21];
+        end;
+      end;
+      Pole4[f, g] := False;
+    end;
+   for f := 0 to x - 1 do
+     for g := 0 to y - 1 do
+     begin
+       if (Pole5[f,g] = True) then
+       begin
+       if (Pole[f,g] = U) then
+       begin
+       Pole[f,g]:=S;
+       Picture[f,g]:=B[22];
+       end
+       else
+       if (Pole[f,g] = S) then
+       begin
+       Pole[f,g]:=S1;
+       Picture[f,g]:=B[24];
+       end
+       else
+       if (Pole[f,g] = S000) then
+       begin
+       Pole[f,g]:=T10;
+       Picture[f,g]:=B[7];
+       end
+       else
+       if (Pole[f,g] = S00) then
+       begin
+       Pole[f,g]:=T20;
+       Picture[f,g]:=B[3];
+       end
+       else
+       if (Pole[f,g] = S0) then
+       begin
+       Pole[f,g]:=S01;
+       Picture[f,g]:=B[26];
+       end
+       else
+       if (Pole[f,g] = S01) then
+       begin
+       Pole[f,g]:=T100;
+       Picture[f,g]:=B[15];
+       end
+       else
+       if (Pole[f,g] = S1) then
+       begin
+       Pole[f,g]:=S11;
+       Picture[f,g]:=B[28];
+       end
+       else
+       if (Pole[f,g] = S10) then
+       begin
+       Pole[f,g]:=T120;
+       Picture[f,g]:=B[14];
+       end
+       else
+       if (Pole[f,g] = S11) then
+       begin
+       Pole[f,g]:=C00;
+       Picture[f,g]:=B[9];
+       end;
+       end;
+      Pole5[f,g]:=False;
+     end;
+  DrawGrid1.Invalidate;
+  Inc(Count);
+  label4.Caption := 'Поколение = ' + IntToStr(Count);
+  label5.Caption := 'Население = ' + IntToStr(c);
+end;
+
+procedure TForm1.DrawGrid2DrawCell(Sender: TObject; aCol, aRow: integer;
+  aRect: TRect; aState: TGridDrawState);
+var
+  counter: integer;
+begin
+  aRow := 5;
+  for sostoyanie := 1 to 5 do
+  begin
+    counter := 0;
+    aCol := 5;
+    DrawGrid2.Canvas.Draw(aCol, aRow, B[sostoyanie]);
+    Inc(counter);
+    aRow := aRow + 30;
+    if counter = 5 then;
+  end;
+  counter := 5;
+  aRow := 5;
+  for sostoyanie := counter to 8 do
+  begin
+    aCol := 35;
+    DrawGrid2.Canvas.Draw(aCol, aRow, B[sostoyanie]);
+    aRow := aRow + 30;
+  end;
+  DrawGrid2.Canvas.Draw(65, 5, B[9]);
+  DrawGrid2.Canvas.Draw(65, 35, B[10]);
+  DrawGrid2.Canvas.Draw(65, 65, B[11]);
+  DrawGrid2.Canvas.Draw(65, 95, B[12]);
+  DrawGrid2.Canvas.Draw(95, 5, B[13]);
+  DrawGrid2.Canvas.Draw(95, 35, B[14]);
+  DrawGrid2.Canvas.Draw(95, 65, B[15]);
+  DrawGrid2.Canvas.Draw(95, 95, B[16]);
+  DrawGrid2.Canvas.Draw(125, 5, B[17]);
+  DrawGrid2.Canvas.Draw(125, 35, B[18]);
+  DrawGrid2.Canvas.Draw(125, 65, B[19]);
+  DrawGrid2.Canvas.Draw(125, 95, B[20]);
+  DrawGrid2.Canvas.Draw(155, 5, B[21]);
+  DrawGrid2.Canvas.Draw(155, 35, B[22]);
+  DrawGrid2.Canvas.Draw(155, 65, B[23]);
+  DrawGrid2.Canvas.Draw(155, 95, B[24]);
+  DrawGrid2.Canvas.Draw(185, 5, B[25]);
+  DrawGrid2.Canvas.Draw(185, 35, B[26]);
+  DrawGrid2.Canvas.Draw(185, 65, B[27]);
+  DrawGrid2.Canvas.Draw(185, 95, B[28]);
+end;
+
+procedure TForm1.DrawGrid1MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: integer);
+begin
+  if (perehod = True) then
+  begin
+    DrawGrid1.MouseToCell(X, Y, aC1, aR1);
+    Picture[aC1, aR1] := buf;
+    if (buf = B[1]) then
+    begin
+      Pole[aC1, aR1] := T30;
+      inc(c);
+    end
+    else
+    if (buf = B[5]) then
+    begin
+      Pole[aC1, aR1] := T00;
+      inc(c);
+    end
+    else
+    if (buf = B[7]) then
+    begin
+      Pole[aC1, aR1] := T10;
+      inc(c);
+    end
+    else
+    if (buf = B[8]) then
+    begin
+      Pole[aC1, aR1] := T11;
+      inc(c);
+    end
+    else
+    if (buf = B[2]) then
+    begin
+      Pole[aC1, aR1] := T31;
+      inc(c);
+    end
+    else
+    if (buf = B[6]) then
+    begin
+      Pole[aC1, aR1] := T01;
+      inc(c);
+    end
+    else
+    if (buf = B[3]) then
+    begin
+      Pole[aC1, aR1] := T20;
+      inc(c);
+    end
+    else
+    if (buf = B[4]) then
+    begin
+      Pole[aC1, aR1] := T21;
+      inc(c);
+    end
+    else
+    if (buf = B[9]) then
+    begin
+      Pole[aC1, aR1] := C00;
+      inc(c);
+    end
+    else
+    if (buf = B[10]) then
+    begin
+      Pole[aC1, aR1] := C01;
+      inc(c);
+    end
+    else
+    if (buf = B[11]) then
+    begin
+      Pole[aC1, aR1] := C10;
+      inc(c);
+    end
+    else
+    if (buf = B[12]) then
+    begin
+      Pole[aC1, aR1] := C11;
+      inc(c);
+    end
+    else
+    if (buf = B[13]) then
+    begin
+      Pole[aC1, aR1] := T130;
+      inc(c);
+    end
+    else
+    if (buf = B[14]) then
+    begin
+      Pole[aC1, aR1] := T120;
+      inc(c);
+    end
+    else
+    if (buf = B[15]) then
+    begin
+      Pole[aC1, aR1] := T100;
+      inc(c);
+    end
+    else
+    if (buf = B[16]) then
+    begin
+      Pole[aC1, aR1] := T110;
+      inc(c);
+    end
+    else
+    if (buf = B[17]) then
+    begin
+      Pole[aC1, aR1] := T131;
+      inc(c);
+    end
+    else
+    if (buf = B[18]) then
+    begin
+      Pole[aC1, aR1] := T121;
+      inc(c);
+    end
+    else
+    if (buf = B[19]) then
+    begin
+      Pole[aC1, aR1] := T101;
+      inc(c);
+    end
+    else
+    if (buf = B[20]) then
+    begin
+      Pole[aC1, aR1] := T111;
+      inc(c);
+    end
+    else
+    if (buf = B[21]) then
+    begin
+      if (Pole[aC1, aR1] <> U) then
+      begin
+        dec(c);
+      end;
+      Pole[aC1, aR1] := U;
+    end
+    else
+    if (buf = B[22]) then
+    begin
+      Pole[aC1, aR1] := S;
+      inc(c);
+    end
+    else
+    if (buf = B[23]) then
+    begin
+      Pole[aC1, aR1] := S0;
+      inc(c);
+    end
+    else
+    if (buf = B[24]) then
+    begin
+      Pole[aC1, aR1] := S1;
+      inc(c);
+    end
+    else
+    if (buf = B[25]) then
+    begin
+      Pole[aC1, aR1] := S00;
+      inc(c);
+    end
+    else
+    if (buf = B[26]) then
+    begin
+      Pole[aC1, aR1] := S01;
+      inc(c);
+    end
+    else
+    if (buf = B[27]) then
+    begin
+      Pole[aC1, aR1] := S10;
+      inc(c);
+    end
+    else
+    if (buf = B[28]) then
+    begin
+      Pole[aC1, aR1] := S11;
+      inc(c);
+    end
+    else
+    if (buf = B[29]) then
+    begin
+      Pole[aC1, aR1] := S000;
+      inc(c);
+    end;
+    perehod := False;
+    label5.Caption := 'Население = ' + IntToStr(c);
+  end;
+end;
+
+procedure TForm1.DrawGrid1DrawCell(Sender: TObject; aCol, aRow: integer;
+  aRect: TRect; aState: TGridDrawState);
+begin
+  DrawGrid1.Canvas.StretchDraw(Form1.DrawGrid1.CellRect(aCol, aRow),
+    Picture[aCol, aRow]);
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  Timer1.Enabled := True;
+  Button2.Enabled := True;
+  Button1.Enabled := False;
+  Vvod.Enabled := False;
+  Edit1.Enabled := False;
+  Edit2.Enabled := False;
+end;
+
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  Timer1.Enabled := False;
+  Button2.Enabled := False;
+  Button1.Enabled := True;
+  Vvod.Enabled := True;
+  Edit1.Enabled := True;
+  Edit2.Enabled := True;
+end;
+
+procedure TForm1.DrawGrid2MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: integer);
+begin
+  Buf := TBitmap.Create;
+  DrawGrid2.MouseToCell(X, Y, aC, aR);
+  if (aC = 1) and (aR = 0) then
+  begin
+    Buf := B[5];
+  end;
+  if (aC = 0) and (aR = 0) then
+  begin
+    Buf := B[1];
+  end;
+  if (aC = 0) and (aR = 1) then
+  begin
+    Buf := B[2];
+  end;
+  if (aC = 0) and (aR = 2) then
+  begin
+    Buf := B[3];
+  end;
+  if (aC = 0) and (aR = 3) then
+  begin
+    Buf := B[4];
+  end;
+  if (aC = 1) and (aR = 2) then
+  begin
+    Buf := B[7];
+  end;
+  if (aC = 1) and (aR = 3) then
+  begin
+    Buf := B[8];
+  end;
+  if (aC = 1) and (aR = 1) then
+  begin
+    Buf := B[6];
+  end;
+  if (aC = 2) and (aR = 0) then
+  begin
+    Buf := B[9];
+  end;
+  if (aC = 2) and (aR = 1) then
+  begin
+    Buf := B[10];
+  end;
+  if (aC = 2) and (aR = 2) then
+  begin
+    Buf := B[11];
+  end;
+  if (aC = 2) and (aR = 3) then
+  begin
+    Buf := B[12];
+  end;
+  if (aC = 3) and (aR = 0) then
+  begin
+    Buf := B[13];
+  end;
+  if (aC = 3) and (aR = 1) then
+  begin
+    Buf := B[14];
+  end;
+  if (aC = 3) and (aR = 2) then
+  begin
+    Buf := B[15];
+  end;
+  if (aC = 3) and (aR = 3) then
+  begin
+    Buf := B[16];
+  end;
+  if (aC = 4) and (aR = 0) then
+  begin
+    Buf := B[17];
+  end;
+  if (aC = 4) and (aR = 1) then
+  begin
+    Buf := B[18];
+  end;
+  if (aC = 4) and (aR = 2) then
+  begin
+    Buf := B[19];
+  end;
+  if (aC = 4) and (aR = 3) then
+  begin
+    Buf := B[20];
+  end;
+  if (aC = 5) and (aR = 0) then
+  begin
+    Buf := B[21];
+  end;
+  if (aC = 5) and (aR = 1) then
+  begin
+    Buf := B[22];
+  end;
+  if (aC = 5) and (aR = 2) then
+  begin
+    Buf := B[23];
+  end;
+  if (aC = 5) and (aR = 3) then
+  begin
+    Buf := B[24];
+  end;
+  if (aC = 6) and (aR = 0) then
+  begin
+    Buf := B[25];
+  end;
+  if (aC = 6) and (aR = 1) then
+  begin
+    Buf := B[26];
+  end;
+  if (aC = 6) and (aR = 2) then
+  begin
+    Buf := B[27];
+  end;
+  if (aC = 6) and (aR = 3) then
+  begin
+    Buf := B[28];
+  end;
+  perehod := True;
+end;
+
+procedure TForm1.DrawGrid3DrawCell(Sender: TObject; aCol, aRow: integer;
+  aRect: TRect; aState: TGridDrawState);
+begin
+  DrawGrid3.Canvas.Draw(5, 5, B[29]);
+end;
+
+procedure TForm1.DrawGrid3MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: integer);
+begin
+  Buf := TBitmap.Create;
+  DrawGrid2.MouseToCell(X, Y, aC, aR);
+  if (aC = 0) and (aR = 0) then
+  begin
+    Buf := B[29];
+  end;
+  perehod := True;
+end;
+
+procedure TForm1.Edit1Change(Sender: TObject);
+begin
+  if Edit1.Text = '' then
+  begin
+    Vvod.Enabled := False;
+    Edit2.Enabled := False;
+    Edit2.Text := '';
+  end
+  else
+    Edit2.Enabled := True;
+end;
+
+procedure TForm1.Edit1KeyPress(Sender: TObject; var Key: char);
+begin
+  case key of
+    '0'..'9': key := key;
+    #8: key := key;
+    else
+      key := #0;
+      ShowMessage('Неправильный ввод');
+  end;
+end;
+
+procedure TForm1.Edit2Change(Sender: TObject);
+begin
+  if Edit2.Text = '' then
+    Vvod.Enabled := False
+  else
+    Vvod.Enabled := True;
+end;
+
+procedure TForm1.Edit2KeyPress(Sender: TObject; var Key: char);
+begin
+  case key of
+    '0'..'9': key := key;
+    #8: key := key;
+    else
+      key := #0;
+      ShowMessage('Неправильный ввод');
+  end;
+end;
+
+
+procedure TForm1.VvodClick(Sender: TObject);
+begin
+  check9 := False;
+  check8 := False;
+  check7 := False;
+  check6 := False;
+  check5 := False;
+  check4 := False;
+  check3 := False;
+  check2 := False;
+  check := False;
+  c := 0;
+  label5.Caption := 'Население = ' + IntToStr(c);
+  Count := 0;
+  label4.Caption := 'Поколение = ' + IntToStr(Count);
+  Button1.Enabled := True;
+  x := StrToInt(edit1.Text);
+  y := StrToInt(edit2.Text);
+  if (x = 0) or (y = 0) then
+  begin
+    ShowMessage('Ошибка ввода');
+    DrawGrid1.ColCount := 0;
+    DrawGrid1.RowCount := 0;
+    DrawGrid1.Enabled := False;
+    DrawGrid2.Enabled := False;
+    Button1.Enabled := False;
+    Edit1.Text := '';
+    Edit2.Text := '';
+    exit;
+  end;
+  if (x > 29) or (y > 29) then
+  begin
+    ShowMessage('Размеры поля слишком больши! Длина и высота не должна превышать 29 клеток');
+    DrawGrid1.ColCount := 0;
+    DrawGrid1.RowCount := 0;
+  end
+  else
+  begin
+    DrawGrid1.ColCount := x;
+    DrawGrid1.RowCount := y;
+    DrawGrid1.Enabled := True;
+    DrawGrid2.Enabled := True;
+    DrawGrid3.Enabled := True;
+    Button1.Enabled := True;
+    for i := 0 to x - 1 do
+      for j := 0 to y - 1 do
+      begin
+        Picture[i, j] := TBitmap.Create;
+        Picture[i, j] := B[21];
+        Pole[i, j] := U;
+        Pole2[i, j] := U;
+        Pole3[i, j] := False;
+        Pole4[i, j] := False;
+        Pole5[i, j] := False;
+      end;
+    DrawGrid1.Invalidate;
+  end;
+  perehod := False;
+end;
+
+end.
