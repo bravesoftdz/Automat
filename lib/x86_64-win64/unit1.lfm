@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 640
+  Left = 633
   Height = 597
-  Top = 155
+  Top = 346
   Width = 953
   BorderStyle = bsDialog
   Caption = 'Автомат фон Неймана'

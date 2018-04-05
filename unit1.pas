@@ -80,6 +80,13 @@ implementation
 
 { TMainForm }
 
+{****p* AutomatFonNeuman/FormCreate
+* DESCRIPTION
+* Процедура создания формы.
+* Используется для предварительной загрузки картинок состояний в объект TBitmap для последующего их отображения в таблице "Состояния".
+* SOURCE
+*}
+
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   path := ExtractFileDir(Application.ExeName);
@@ -90,6 +97,15 @@ begin
       IntToStr(NumberState) + '.bmp');
   end;
 end;
+
+{*****}
+
+{****p* AutomatFonNeuman/StartTimer
+* DESCRIPTION
+* Процедура старта таймера.
+* Используется для описания правил перехода между состояниями автомата.
+* SOURCE
+*}
 
 procedure TMainForm.StartTimer(Sender: TObject);
 var
@@ -1035,7 +1051,6 @@ begin
           Picture[f - 1, g] := BitmapStates[5];
           check5 := True;
         end;
-        ////////////////////////////
         if (Field[f - 1, g] = T20) or (Field[f - 1, g] = T21) then
         begin
           Field3[f - 1, g] := True;
@@ -1060,7 +1075,6 @@ begin
         begin
           Field3[f - 1, g] := True;
         end;
-        ////////////////////////////
         if (Field[f, g + 1] = T10) and (Field[f + 1, g] = T21) then
         begin
           Field2[f + 1, g] := T20;
@@ -1085,7 +1099,6 @@ begin
           Picture[f + 1, g] := BitmapStates[3];
           check5 := True;
         end;
-        ///////////////////////////
         if (Field[f + 1, g] = T00) or (Field[f + 1, g] = T01) then
         begin
           Field3[f + 1, g] := True;
@@ -1110,7 +1123,6 @@ begin
         begin
           Field3[f + 1, g] := True;
         end;
-        ///////////////////////////
         if (Field[f, g + 1] = T10) and (Field[f, g - 1] = T31) then
         begin
           Field2[f, g - 1] := T30;
@@ -1135,7 +1147,6 @@ begin
           Picture[f, g - 1] := BitmapStates[1];
           check5 := True;
         end;
-        ///////////////////////////
         if (Field[f, g - 1] = T10) or (Field[f, g - 1] = T11) then
         begin
           Field3[f, g - 1] := True;
@@ -1160,7 +1171,6 @@ begin
         begin
           Field3[f, g - 1] := True;
         end;
-        ///////////////////////////
         if (Field[f + 1, g] = T20) and (Field[f, g + 1] = T11) then
         begin
           Field2[f, g + 1] := T10;
@@ -1185,7 +1195,6 @@ begin
           Picture[f, g + 1] := BitmapStates[7];
           check5 := True;
         end;
-        //////////////////////////////
         if (Field[f, g + 1] = T30) or (Field[f, g + 1] = T31) then
         begin
           Field3[f, g + 1] := True;
@@ -1210,7 +1219,6 @@ begin
         begin
           Field3[f, g + 1] := True;
         end;
-        //////////////////////////////
         if (check5 = False) then
         begin
           Field2[f, g] := C00;
@@ -1286,7 +1294,6 @@ begin
           Picture[f - 1, g] := BitmapStates[5];
           check := True;
         end;
-        ///////////////////////
         if (Field[f - 1, g] = T20) or (Field[f - 1, g] = T21) then
         begin
           Field3[f - 1, g] := True;
@@ -1311,7 +1318,6 @@ begin
         begin
           Field3[f - 1, g] := True;
         end;
-        ///////////////////////
         if (Field[f, g + 1] = T10) and (Field[f, g - 1] = T31) then
         begin
           Field2[f, g - 1] := T30;
@@ -1342,7 +1348,6 @@ begin
           Picture[f, g - 1] := BitmapStates[1];
           check := True;
         end;
-        ////////////////////////
         if (Field[f, g - 1] = T10) or (Field[f, g - 1] = T11) then
         begin
           Field3[f, g - 1] := True;
@@ -1367,7 +1372,6 @@ begin
         begin
           Field3[f, g - 1] := True;
         end;
-        ////////////////////////
         if (Field[f, g + 1] = T10) and (Field[f + 1, g] = T21) then
         begin
           Field2[f + 1, g] := T20;
@@ -1398,7 +1402,6 @@ begin
           Picture[f + 1, g] := BitmapStates[3];
           check := True;
         end;
-        ////////////////////////
         if (Field[f + 1, g] = T00) or (Field[f + 1, g] = T01) then
         begin
           Field3[f + 1, g] := True;
@@ -1423,7 +1426,6 @@ begin
         begin
           Field3[f + 1, g] := True;
         end;
-        ////////////////////////
         if (Field[f + 1, g] = T20) and (Field[f, g + 1] = T11) then
         begin
           Field2[f, g + 1] := T10;
@@ -1454,7 +1456,6 @@ begin
           Picture[f, g + 1] := BitmapStates[7];
           check := True;
         end;
-        ///////////////////////
         if (Field[f, g + 1] = T30) or (Field[f, g + 1] = T31) then
         begin
           Field3[f, g + 1] := True;
@@ -1479,7 +1480,6 @@ begin
         begin
           Field3[f, g + 1] := True;
         end;
-        ///////////////////////
         if (check2 = False) then
         begin
           Field2[f, g] := C10;
@@ -1499,9 +1499,6 @@ begin
           check7 := False;
         end;
       end;
-      // конец конфлюентных состояний
-
-      // начало обычный передающих состояний
       if (Field[f, g] = T11) and (Field[f, g - 1] = T10) or
         (Field[f, g] = T11) and (Field[f, g - 1] = T11) then
       begin
@@ -1638,9 +1635,6 @@ begin
         Picture[f, g] := BitmapStates[5];
       end
       else
-      // конец обычных передающих состояний
-
-      // начало обычных и специальых передающих состояний
       if (Field[f, g] = T01) and (Field[f + 1, g] = T101) or
         (Field[f, g] = T01) and (Field[f + 1, g] = T111) or
         (Field[f, g] = T01) and (Field[f + 1, g] = T121) or (Field[f, g] = T01) and
@@ -1725,9 +1719,6 @@ begin
         Picture[f, g] := BitmapStates[1];
       end
       else
-      // конец обычных и специальых передающих состояний
-
-      // начало специальных передающих состояний
       if (Field[f, g] = T101) and (Field[f + 1, g] = T100) or
         (Field[f, g] = T101) and (Field[f + 1, g] = T101) then
       begin
@@ -1863,9 +1854,6 @@ begin
         Field2[f + 1, g] := T120;
         Picture[f + 1, g] := BitmapStates[14];
       end
-      // конец специальных передающих состояний
-
-      // начало специальных и обычных передающих
       else
       if (Field[f, g] = T101) and (Field[f + 1, g] = T01) or
         (Field[f, g] = T101) and (Field[f + 1, g] = T11) or
@@ -2095,6 +2083,15 @@ begin
   LabelForPopulation.Caption := 'Население = ' + IntToStr(CountPopulation);
 end;
 
+{*****}
+
+{****p* AutomatFonNeuman/DrawGridStatesDrawCell
+* DESCRIPTION
+* Процедура отрисовки состояний.
+* Используется для отрисовки состояний в таблице "Состояния".
+* SOURCE
+*}
+
 procedure TMainForm.DrawGridStatesDrawCell(Sender: TObject; aCol, aRow: integer;
   aRect: TRect; aState: TGridDrawState);
 begin
@@ -2127,6 +2124,15 @@ begin
   DrawGridStates.Canvas.Draw(185, 65, BitmapStates[27]);
   DrawGridStates.Canvas.Draw(185, 95, BitmapStates[28]);
 end;
+
+{*****}
+
+{****p* AutomatFonNeuman/DrawGridAutomatMouseUp
+* DESCRIPTION
+* Процедура заполнения клетки состоянием.
+* Используется для того, чтобы после нажатия на определенную клетку на поле переместить туда выбранное состояние из таблицы "Состояния".
+* SOURCE
+*}
 
 procedure TMainForm.DrawGridAutomatMouseUp(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -2456,12 +2462,30 @@ begin
   end;
 end;
 
+{*****}
+
+{****p* AutomatFonNeuman/DrawGridAutomatDrawCell
+* DESCRIPTION
+* Процедура заполнения клетки состоянием.
+* Используется для того, чтобы после нажатия на определенную клетку на поле переместить туда выбранное состояние из таблицы "Состояния".
+* SOURCE
+*}
+
 procedure TMainForm.DrawGridAutomatDrawCell(Sender: TObject;
   aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
 begin
   DrawGridAutomat.Canvas.StretchDraw(MainForm.DrawGridAutomat.CellRect(aCol, aRow),
     Picture[aCol, aRow]);
 end;
+
+{*****}
+
+{****p* AutomatFonNeuman/DrawGridAutomatClick
+* DESCRIPTION
+* Процедура запуска автомата.
+* Используется для того, что запустить процедуру StartTimer.
+* SOURCE
+*}
 
 procedure TMainForm.StartAutomatClick(Sender: TObject);
 begin
@@ -2473,6 +2497,15 @@ begin
   EditForRowCount.Enabled := False;
 end;
 
+{*****}
+
+{****p* AutomatFonNeuman/PauseClick
+* DESCRIPTION
+* Процедура остановки автомата.
+* Используется для того, чтобы поставить процедуру StartTimer и автомат на паузу.
+* SOURCE
+*}
+
 procedure TMainForm.PauseClick(Sender: TObject);
 begin
   Start.Enabled := False;
@@ -2482,6 +2515,15 @@ begin
   EditForColCount.Enabled := True;
   EditForRowCount.Enabled := True;
 end;
+
+{*****}
+
+{****p* AutomatFonNeuman/DrawGridStatesMouseUp
+* DESCRIPTION
+* Процедура перемещения состояния из таблицы "Состояния" в буфер.
+* Используется для того, чтобы поместить выбранное состояние из таблицы в буфер для последующего его перемещения на поле.
+* SOURCE
+*}
 
 procedure TMainForm.DrawGridStatesMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
@@ -2603,11 +2645,29 @@ begin
   Transition := True;
 end;
 
+{*****}
+
+{****p* AutomatFonNeuman/DrawGridStateDrawCell
+* DESCRIPTION
+* Процедура отображения состояния в таблице "Состояния".
+* Используется для того, чтобы отобразить состояние.
+* SOURCE
+*}
+
 procedure TMainForm.DrawGridStateDrawCell(Sender: TObject; aCol, aRow: integer;
   aRect: TRect; aState: TGridDrawState);
 begin
   DrawGridState.Canvas.Draw(5, 5, BitmapStates[29]);
 end;
+
+{*****}
+
+{****p* AutomatFonNeuman/DrawGridStateMouseUp
+* DESCRIPTION
+* Процедура перемещения в состояния в буфер.
+* Используется для того, чтобы поместить состояние из таблицы в буфер.
+* SOURCE
+*}
 
 procedure TMainForm.DrawGridStateMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
@@ -2621,6 +2681,15 @@ begin
   Transition := True;
 end;
 
+{*****}
+
+{****p* AutomatFonNeuman/EditForColCountChange
+* DESCRIPTION
+* Процедура проверки заполнения на пустоту.
+* Используется для того, чтобы последовательно заполнять поля ввода.
+* SOURCE
+*}
+
 procedure TMainForm.EditForColCountChange(Sender: TObject);
 begin
   if EditForColCount.Text = '' then
@@ -2633,6 +2702,15 @@ begin
     EditForRowCount.Enabled := True;
 end;
 
+{*****}
+
+{****p* AutomatFonNeuman/EditForColCountKeyPress
+* DESCRIPTION
+* Процедура проверки заполнения поля числами.
+* Используется для того, чтобы в поле можно было вводить только числа.
+* SOURCE
+*}
+
 procedure TMainForm.EditForColCountKeyPress(Sender: TObject; var Key: char);
 begin
   case key of
@@ -2644,6 +2722,15 @@ begin
   end;
 end;
 
+{*****}
+
+{****p* AutomatFonNeuman/EditForRowCountChange
+* DESCRIPTION
+* Процедура проверки заполнения на пустоту.
+* Используется для того, чтобы последовательно заполнять поля ввода.
+* SOURCE
+*}
+
 procedure TMainForm.EditForRowCountChange(Sender: TObject);
 begin
   if EditForRowCount.Text = '' then
@@ -2651,6 +2738,15 @@ begin
   else
     EnterColCountAndRowCount.Enabled := True;
 end;
+
+{*****}
+
+{****p* AutomatFonNeuman/EditForRowCountKeyPress
+* DESCRIPTION
+* Процедура проверки заполнения поля числами.
+* Используется для того, чтобы в поле можно было вводить только числа.
+* SOURCE
+*}
 
 procedure TMainForm.EditForRowCountKeyPress(Sender: TObject; var Key: char);
 begin
@@ -2663,6 +2759,14 @@ begin
   end;
 end;
 
+{*****}
+
+{****p* AutomatFonNeuman/EnterColCountAndRowCountClick
+* DESCRIPTION
+* Процедура заполнения поля.
+* Используется для того, чтобы заполнить поле количеством клеток в длину и ширину, которые указаны в полях для ввода.
+* SOURCE
+*}
 
 procedure TMainForm.EnterColCountAndRowCountClick(Sender: TObject);
 begin
@@ -2725,3 +2829,5 @@ begin
 end;
 
 end.
+
+{*****}
